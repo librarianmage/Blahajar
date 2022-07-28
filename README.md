@@ -1,4 +1,4 @@
-# Blåhajar
+# Blåhaj
 
 Adds the wildly popular IKEA plush to Caves of Qud 🥰🦈🥰
 
