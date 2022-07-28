@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<bodies>
+  <anatomies>
+    <anatomy Name="Books_BlahajPlush" BodyCategory="Animal">
+      <part Type="Head">
+        <part Type="Face" DefaultBehavior="Madpole_Jaws" />
+      </part>
+      <part Type="Back" />
+      <part Type="Dorsal Fin" />
+      <part Type="Fin" Laterality="Right" />
+      <part Type="Fin" Laterality="Left" />
+      <part Type="Missile Weapon" Laterality="Right" />
+      <part Type="Missile Weapon" Laterality="Left" />
+      <part Type="Tail Fin" />
+    </anatomy>
+  </anatomies>
+</bodies>

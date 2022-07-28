@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<objects>
+  <object Name="Books_Blahaj" Inherits="BaseBed">
+    <part Name="Render" DisplayName="blahaj" Tile="Creatures/blahaj.png"
+          ColorString="&amp;C" DetailColor="y"
+          Occluding="false" RenderIfDark="false" />
+    <part Name="Description" Short="Frozen in fuzzy blue fabric, an ancient fish's soft toothy smile is preserved for comfort and cuddling. Its goofy cheer survives any written record of its actual aquatic antecedent, save a fragment of a fragment of forgotten taxonomic jargon, shorn of context: &quot;hehe shonk&quot;" />
+
+    <part Name="Physics" Weight="10" Takeable="true" Solid="false" />
+    <stat Name="Hitpoints" Value="120" />
+    <stat Name="AV" Value="4"/>
+
+    <part Name="Bed" IsBioScannable="true" NameForStatus="ErgonomicAdaptations" />
+
+    <part Name="Corpse" CorpseChance="100" CorpseBlueprint="Books_BlahajStuffing" />
+
+    <tag Name="Species" Value="shark" />
+    <tag Name="Culture" Value="Animal" />
+
+    <tag Name="BodyType" Value="Books_BlahajPlush" />
+
+    <tag Name="HeroNameTitleDescriptor" Value="Soft,Cozy,Fuzzy,Warm,Lovable" />
+
+    <tag Name="AnimatedSkills" Value="Endurance_Swimming,Axe_Expertise,Axe_Dismember,Discipline_Meditate,Discipline_FastingWay" />
+    <mutation Name="Gills" Level="12" />
+    <mutation Name="Regeneration" Level="5"/>
+
+    <intproperty Name="Bleeds" Value="1" />
+    <tag Name="BleedLiquid" Value="convalessence-1000" />
+
+    <intproperty Name="Inorganic" Value="0" />
+
+    <tag Name="LiveAnimal" />
+    <part Name="Commerce" Value="5" />
+    <tag Name="Tier" Value="1" />
+    <tag Name="TechTier" Value="5" />
+    <stag Name="Luxury" />
+  </object>
+
+  <object Name="Books_BlahajStuffing" Inherits="Corpse">
+    <part Name="Render" DisplayName="blahaj stuffing" ColorString="&amp;Y" TileColor="&amp;W" DetailColor="y" />
+    <part Name="Description" Short="Scattered bunches of synthetic fuzz." />
+    <part Name="Food" Load="Delete"/>
+    <part Name="Physics" Weight="5" />
+    <part Name="Commerce" Value="4" />
+    <tag Name="Tier" Value="1" />
+  </object>
+
+  <object Name="Books_BlahajSpawner" Inherits="Widget">
+    <part Name="Books_BlahajSpawn" />
+  </object>
+
+  <object Name="ConvalessencePuddle" Load="Merge">
+    <part Name="Books_BlahajSpawn_Spawner" />
+  </object>
+
+  <object Name="ConvalessenceDeepPool" Load="Merge">
+    <part Name="Books_BlahajSpawn_Spawner" />
+  </object>
+</objects>
