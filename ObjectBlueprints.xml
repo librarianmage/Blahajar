@@ -2,7 +2,7 @@
 <objects>
   <object Name="Books_Blahaj" Inherits="BaseBed">
     <part Name="Render" DisplayName="blahaj" Tile="Creatures/blahaj.png"
-          ColorString="&amp;C" DetailColor="y"
+          ColorString="&amp;C" DetailColor="Y"
           Occluding="false" RenderIfDark="false" />
     <part Name="Description" Short="Frozen in fuzzy blue fabric, an ancient fish's soft toothy smile is preserved for comfort and cuddling. Its goofy cheer survives any written record of its actual aquatic antecedent, save a fragment of a fragment of forgotten taxonomic jargon, shorn of context: &quot;hehe shonk&quot;" />
 
