@@ -40,7 +40,7 @@
   <object Name="Books_BlahajStuffing" Inherits="Corpse">
     <part Name="Render" DisplayName="blahaj stuffing" ColorString="&amp;Y" TileColor="&amp;W" DetailColor="y" />
     <part Name="Description" Short="Scattered bunches of synthetic fuzz." />
-    <part Name="Food" Load="Delete"/>
+    <removepart Name="Food" />
     <part Name="Physics" Weight="5" />
     <part Name="Commerce" Value="4" />
     <tag Name="Tier" Value="1" />
