@@ -7,6 +7,7 @@ Tested to work on game versions 204.100 / 205.54 (beta)
 * Update names
 * Refactor part code
 
+Meta:
 * Add CHANGELOG.md
 * Update icon
 * Update mod description
