@@ -15,7 +15,7 @@ namespace XRL.World.Parts
         private const string Blueprint = "Books_Blahaj";
 
         /// <summary>Chances of spawning (percentage)</summary>
-        public int Chance = 1;
+        public int SpawnChance = 1;
 
         /// <summary>Chances of revealing when entering the ParentObject's cell (percentage)</summary>
         public int TrampleChance = 50;
@@ -28,7 +28,7 @@ namespace XRL.World.Parts
 
         public override bool SameAs(IPart p) =>
             (p is Books_BlahajSpawner o)
-            && o.Chance == Chance
+            && o.SpawnChance == SpawnChance
             && o.Search_Difficulty == Search_Difficulty
             && o.DeleteParent == DeleteParent
             && base.SameAs(p);
@@ -40,7 +40,7 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(ObjectCreatedEvent E)
         {
-            if (!Chance.in100())
+            if (!SpawnChance.in100())
             {
                 ParentObject.RemovePart(this);
 
