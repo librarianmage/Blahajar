@@ -1,8 +1,8 @@
 {
-  "id": "Blahaj",
-  "title": "{{C|Blahajar}}",
+  "id": "Books_Blahaj",
+  "title": "{{C|Bl\u0086hajar}}",
   "description": "hehe shonk",
   "version": "1.1",
-  "author": "librarianmage",
-  "previewImage": "icon.png"
+  "author": "{{R|librarianmage}}",
+  "previewImage": "Assets/icon.png"
 }
