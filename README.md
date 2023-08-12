@@ -2,7 +2,7 @@
 
 Adds the wildly popular IKEA plush to Caves of Qud 🥰🦈🥰
 
-Blåhajar can be found where animatable furnature is or in deep pools of convalessence.
+Blåhajar can be found where animatable furniture is or in deep pools of convalessence.
 
 Tested to work on game version 203.54
 
