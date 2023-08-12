@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <objects>
   <object Name="Books_Blahaj" Inherits="BaseBed">
-    <part Name="Render" DisplayName="blahaj" Tile="Creatures/blahaj.png"
+    <part Name="Render" DisplayName="bl&#x86;haj" Tile="Creatures/blahaj.png"
           ColorString="&amp;C" DetailColor="Y"
           Occluding="false" RenderIfDark="false" />
     <part Name="Description" Short="Frozen in fuzzy blue fabric, an ancient fish's soft toothy smile is preserved for comfort and cuddling. Its goofy cheer survives any written record of its actual aquatic antecedent, save a fragment of a fragment of forgotten taxonomic jargon, shorn of context: &quot;hehe shonk&quot;" />
 
-    <part Name="Physics" Weight="10" Takeable="true" Solid="false" />
+    <part Name="Physics" Weight="20" Takeable="true" Solid="false" />
     <stat Name="Hitpoints" Value="120" />
     <stat Name="AV" Value="4"/>
 
@@ -20,6 +20,7 @@
     <tag Name="BodyType" Value="Books_BlahajPlush" />
 
     <tag Name="HeroNameTitleDescriptor" Value="Soft,Cozy,Fuzzy,Warm,Lovable" />
+    <xtagTextFragments Skin="fabric" PoeticFeatures="soft surfaces,graceful repose,inviting presence" />
 
     <tag Name="AnimatedSkills" Value="Endurance_Swimming,Axe_Expertise,Axe_Dismember,Discipline_Meditate,Discipline_FastingWay" />
     <mutation Name="Gills" Level="12" />
@@ -38,7 +39,7 @@
   </object>
 
   <object Name="Books_BlahajStuffing" Inherits="Corpse">
-    <part Name="Render" DisplayName="blahaj stuffing" ColorString="&amp;Y" TileColor="&amp;W" DetailColor="y" />
+    <part Name="Render" DisplayName="bl&#x86;haj stuffing" ColorString="&amp;Y" TileColor="&amp;W" DetailColor="y" />
     <part Name="Description" Short="Scattered bunches of synthetic fuzz." />
     <removepart Name="Food" />
     <part Name="Physics" Weight="5" />
@@ -46,15 +47,15 @@
     <tag Name="Tier" Value="1" />
   </object>
 
-  <object Name="Books_BlahajSpawner" Inherits="Widget">
-    <part Name="Books_BlahajSpawn" />
+  <object Name="ConvalessencePuddle" Load="Merge">
+    <part Name="Books_BlahajSpawner" />
   </object>
 
-  <object Name="ConvalessencePuddle" Load="Merge">
-    <part Name="Books_BlahajSpawn_Spawner" />
+  <object Name="ConvalessencePool" Load="Merge">
+    <part Name="Books_BlahajSpawner" />
   </object>
 
   <object Name="ConvalessenceDeepPool" Load="Merge">
-    <part Name="Books_BlahajSpawn_Spawner" />
+    <part Name="Books_BlahajSpawner" />
   </object>
 </objects>

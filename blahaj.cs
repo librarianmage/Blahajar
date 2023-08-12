@@ -5,46 +5,66 @@ using XRL.World.Capabilities;
 
 namespace XRL.World.Parts
 {
+    /// <summary>
+    ///   Has a chance of spawning a Blåhaj
+    /// </summary>
     [Serializable]
-    public class Books_BlahajSpawn : IPart
+    public class Books_BlahajSpawner : IPart
     {
-        private const string Blahaj_Blueprint = "Books_Blahaj";
-        private const int Search_Difficulty = 16;
+        /// <summary>Spawning blueprint</summary>
+        private const string Blueprint = "Books_Blahaj";
 
-        public override bool SameAs(IPart p) => base.SameAs(p);
+        /// <summary>Chances of spawning (percentage)</summary>
+        public int Chance = 1;
 
-        public override void Initialize()
-        {
-            base.Initialize();
-            ParentObject.pRender.CustomRender = true;
-            ParentObject.pRender.Visible = false;
-        }
+        /// <summary>Chances of revealing when entering the ParentObject's cell (percentage)</summary>
+        public int TrampleChance = 50;
+
+        /// <summary>Difficulty of searching roll (INT)</summary>
+        public int Search_Difficulty = 14;
+
+        /// <summary>Whether to delete parent</summary>
+        public bool DeleteParent = false;
+
+        public override bool SameAs(IPart p) =>
+            (p is Books_BlahajSpawner o)
+            && o.Chance == Chance
+            && o.Search_Difficulty == Search_Difficulty
+            && o.DeleteParent == DeleteParent
+            && base.SameAs(p);
 
         public override bool WantEvent(int ID, int cascade) =>
-            base.WantEvent(ID, cascade) || ID == ObjectEnteredCellEvent.ID;
+            base.WantEvent(ID, cascade)
+            || ID == ObjectCreatedEvent.ID
+            || ID == ObjectEnteredCellEvent.ID;
+
+        public override bool HandleEvent(ObjectCreatedEvent E)
+        {
+            if (!Chance.in100())
+            {
+                ParentObject.RemovePart(this);
+
+                if (DeleteParent)
+                {
+                    ParentObject.Obliterate(Silent: true);
+                }
+            }
+
+            return base.HandleEvent(E);
+        }
 
         public override bool HandleEvent(ObjectEnteredCellEvent E)
         {
             Cell currentCell = ParentObject.CurrentCell;
 
-            if (E.Object.Blueprint != Blahaj_Blueprint && E.Object.IsCombatObject() && currentCell != null && currentCell.HasWadingDepthLiquid() && 50.in100())
+            if (
+                E.Object.Blueprint != Blueprint
+                && E.Object.IsCombatObject()
+                && currentCell != null
+                && TrampleChance.in100()
+            )
             {
-                var cell = currentCell
-                    .GetAdjacentCells()
-                    .Where((c) => c.HasWadingDepthLiquid())
-                    .GetRandomElement();
-
-                GameObject shonk = GameObject.create(Blahaj_Blueprint);
-                shonk.MakeActive();
-                cell.AddObject(shonk);
-
-                if (IComponent<GameObject>.Visible(shonk))
-                {
-                    GameObject thePlayer = IComponent<GameObject>.ThePlayer;
-                    IComponent<GameObject>.XDidY(thePlayer, "spot", $"a blahaj { thePlayer.DescribeDirectionToward(shonk) }", "!", null, thePlayer);
-                }
-
-                ParentObject.Obliterate();
+                Reveal(AdjacentCell: true);
             }
 
             return base.HandleEvent(E);
@@ -58,76 +78,79 @@ namespace XRL.World.Parts
             base.Register(Object);
         }
 
+
+
         public override bool FireEvent(Event E)
         {
             if (E.ID == "CustomRender")
             {
-                if (E.GetParameter("RenderEvent") is RenderEvent renderEvent && (renderEvent.Lit == LightLevel.Radar || renderEvent.Lit == LightLevel.LitRadar))
+                if (
+                    E.GetParameter("RenderEvent") is RenderEvent renderEvent
+                    && (renderEvent.Lit == LightLevel.Radar
+                        || renderEvent.Lit == LightLevel.LitRadar)
+                )
                 {
                     Reveal();
                 }
             }
             else if (E.ID == "Searched")
             {
-                GameObject gameObjectParameter = E.GetGameObjectParameter("Searcher");
-                if (gameObjectParameter.CurrentCell != ParentObject.CurrentCell
-                    && ParentObject.CurrentCell.HasWadingDepthLiquid()
-                    && E.GetIntParameter("Bonus") + Stat.Random(1, gameObjectParameter.Stat("Intelligence")) >= Search_Difficulty)
+                GameObject Searcher = E.GetGameObjectParameter("Searcher");
+
+                if (
+                    Searcher.CurrentCell != ParentObject.CurrentCell
+                    && Stat.MakeSave(Searcher, "Intelligence", Search_Difficulty)
+                )
                 {
-                    Reveal(gameObjectParameter);
+                    Reveal(Searcher);
                 }
             }
             return base.FireEvent(E);
         }
 
-        public void Reveal(GameObject who = null)
+        public void Reveal(GameObject who = null, bool AdjacentCell = false)
         {
-            if (who == null)
+            who = who ?? The.Player;
+
+            var cell = ParentObject.CurrentCell;
+
+            if (AdjacentCell)
             {
-                who = IComponent<GameObject>.ThePlayer;
+                cell = ParentObject.CurrentCell
+                    .YieldAdjacentCells(1)
+                    .Where((c) => c.HasWadingDepthLiquid())
+                    .GetRandomElement() ?? currentCell;
             }
-            if (who != null)
+
+            GameObject shonk = GameObject.create(Blueprint);
+            shonk.MakeActive();
+            cell.AddObject(shonk);
+
+            XDidYToZ(
+                Actor: who,
+                Verb: "spot",
+                Object: shonk,
+                Extra: who.DescribeDirectionToward(shonk),
+                EndMark: "!",
+                ColorAsGoodFor: who,
+                IndefiniteObject: true,
+                UseVisibilityOf: shonk
+            );
+
+            if (
+                Visible(shonk)
+                && AutoAct.IsActive()
+                && The.Player.IsRelevantHostile(shonk))
             {
-                IComponent<GameObject>.XDidY(who, "spot", $"a blahaj { who.DescribeDirectionToward(ParentObject) }", "!", null, who);
-            }
-            GameObject gameObject = GameObject.create(Blahaj_Blueprint);
-            gameObject.MakeActive();
-            ParentObject.CurrentCell.AddObject(gameObject);
-            if (IComponent<GameObject>.Visible(gameObject) && AutoAct.IsActive() && IComponent<GameObject>.ThePlayer.IsRelevantHostile(gameObject))
-            {
-                AutoAct.Interrupt(null, null, gameObject);
-            }
-            ParentObject.Destroy();
-        }
-
-    }
-
-    [Serializable]
-    public class Books_BlahajSpawn_Spawner : IPart
-    {
-        public override bool SameAs(IPart p) => base.SameAs(p);
-
-        public override bool WantEvent(int ID, int cascade) =>
-            base.WantEvent(ID, cascade) || ID == ObjectEnteredCellEvent.ID;
-
-        public override bool HandleEvent(ObjectEnteredCellEvent E)
-        {
-            if (4.in100())
-            {
-                var obj = GameObject.create("Books_BlahajSpawner");
-                obj.MakeActive();
-                ParentObject.CurrentCell.AddObject(obj);
-                MetricsManager.LogInfo($"Created spawner at { ParentObject.CurrentCell.ToString() }");
-            }
-            else
-            {
-
+                AutoAct.Interrupt(IndicateObject: shonk);
             }
 
             ParentObject.RemovePart(this);
 
-            return base.HandleEvent(E);
-
+            if (DeleteParent)
+            {
+                ParentObject.Obliterate(Silent: true);
+            }
         }
     }
 

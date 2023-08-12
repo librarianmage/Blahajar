@@ -5,6 +5,9 @@
 * Update icon
 * Update display name
 * Update description
+* Update item names
+* Refactor part code
+* Rebalance frequency
 
 ## v1.1 - 2022-08-03
 Tested to work on game version 203.54
