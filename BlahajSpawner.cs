@@ -6,32 +6,42 @@ using XRL.World.Capabilities;
 namespace XRL.World.Parts
 {
     /// <summary>
-    ///   Has a chance of spawning a Blåhaj
+    ///   Object has a chance of spawning a hidden Blåhaj
     /// </summary>
+    /// <remarks>
+    ///   Object has a <see cref="SpawnChance"/>% chance of activating upon creation. When active, the spawning can be triggered under three circumstances:
+    ///   <list type="number">
+    ///     <item>
+    ///       <description>The cell is lit with <c>Omniscient</c>, <c>LitRadar</c>, or <c>Radar</c> light.</description>
+    ///     </item>
+    ///     <item>
+    ///       <description>A creature enters the same cell, with <see cref="TrampleRevealChance"/>% chance.</description>
+    ///     </item>
+    ///     <item>
+    ///       <description>The player makes an INT save of difficulty <see cref="SearchDifficulty"/> while searching.</description>
+    ///     </item>
+    ///   </list>
+    ///   When the part fails to activate or successfully spawns, it will remove itself from its parent and optionally obliterate its parent if <see cref="ObliterateParent"/> is set.
+    /// </remarks>
+    /// <seealso cref="LightLevel"/>
+    /// <seealso cref="Physics.Search"/>
     [Serializable]
     public class Books_BlahajSpawner : IPart
     {
-        /// <summary>Spawning blueprint</summary>
-        private const string Blueprint = "Books_Blahaj";
+        private const string BlahajBlueprint = "Books_Blahaj";
 
-        /// <summary>Chances of spawning (percentage)</summary>
         public int SpawnChance = 1;
-
-        /// <summary>Chances of revealing when entering the ParentObject's cell (percentage)</summary>
-        public int TrampleChance = 50;
-
-        /// <summary>Difficulty of searching roll (INT)</summary>
-        public int Search_Difficulty = 14;
-
-        /// <summary>Whether to delete parent</summary>
-        public bool DeleteParent = false;
+        public int TrampleRevealChance = 50;
+        public int SearchDifficulty = 14;
+        public bool ObliterateParent = false;
 
         public override bool SameAs(IPart p) =>
-            (p is Books_BlahajSpawner o)
+            base.SameAs(p)
+            && p is Books_BlahajSpawner o
             && o.SpawnChance == SpawnChance
-            && o.Search_Difficulty == Search_Difficulty
-            && o.DeleteParent == DeleteParent
-            && base.SameAs(p);
+            && o.TrampleRevealChance == TrampleRevealChance
+            && o.SearchDifficulty == SearchDifficulty
+            && o.ObliterateParent == ObliterateParent;
 
         public override bool WantEvent(int ID, int cascade) =>
             base.WantEvent(ID, cascade)
@@ -40,31 +50,21 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(ObjectCreatedEvent E)
         {
-            if (!SpawnChance.in100())
-            {
-                ParentObject.RemovePart(this);
-
-                if (DeleteParent)
-                {
-                    ParentObject.Obliterate(Silent: true);
-                }
-            }
+            if (!SpawnChance.in100()) RemoveSelf();
 
             return base.HandleEvent(E);
         }
 
         public override bool HandleEvent(ObjectEnteredCellEvent E)
         {
-            Cell currentCell = ParentObject.CurrentCell;
+            var currentCell = ParentObject.CurrentCell;
 
-            if (
-                E.Object.Blueprint != Blueprint
+            if (E.Object.Blueprint != BlahajBlueprint
                 && E.Object.IsCombatObject()
                 && currentCell != null
-                && TrampleChance.in100()
-            )
+                && TrampleRevealChance.in100())
             {
-                Reveal(AdjacentCell: true);
+                Reveal(adjacentCell: true);
             }
 
             return base.HandleEvent(E);
@@ -75,82 +75,80 @@ namespace XRL.World.Parts
         {
             Object.RegisterPartEvent(this, "CustomRender");
             Object.RegisterPartEvent(this, "Searched");
+
             base.Register(Object);
         }
-
-
 
         public override bool FireEvent(Event E)
         {
             if (E.ID == "CustomRender")
             {
-                if (
-                    E.GetParameter("RenderEvent") is RenderEvent renderEvent
-                    && (renderEvent.Lit == LightLevel.Radar
-                        || renderEvent.Lit == LightLevel.LitRadar)
-                )
+                if (E.GetParameter("RenderEvent") is RenderEvent renderEvent
+                    && (renderEvent.Lit == LightLevel.Omniscient
+                        || renderEvent.Lit == LightLevel.Radar
+                        || renderEvent.Lit == LightLevel.LitRadar))
                 {
                     Reveal();
                 }
             }
             else if (E.ID == "Searched")
             {
-                GameObject Searcher = E.GetGameObjectParameter("Searcher");
+                var searcher = E.GetGameObjectParameter("Searcher");
 
-                if (
-                    Searcher.CurrentCell != ParentObject.CurrentCell
-                    && Stat.MakeSave(Searcher, "Intelligence", Search_Difficulty)
-                )
+                if (searcher.CurrentCell != ParentObject.CurrentCell
+                    && Stat.MakeSave(searcher, "Intelligence", SearchDifficulty))
                 {
-                    Reveal(Searcher);
+                    Reveal(searcher);
                 }
             }
+
             return base.FireEvent(E);
         }
 
-        public void Reveal(GameObject who = null, bool AdjacentCell = false)
+        private void Reveal(GameObject finder = null, bool adjacentCell = false)
         {
-            who = who ?? The.Player;
+            finder = finder ?? The.Player;
 
-            var cell = ParentObject.CurrentCell;
+            var cell = currentCell;
 
-            if (AdjacentCell)
+            if (adjacentCell)
             {
-                cell = ParentObject.CurrentCell
+                cell = cell
                     .YieldAdjacentCells(1)
                     .Where((c) => c.HasWadingDepthLiquid())
                     .GetRandomElement() ?? currentCell;
             }
 
-            GameObject shonk = GameObject.create(Blueprint);
+            var shonk = GameObject.create(BlahajBlueprint);
             shonk.MakeActive();
             cell.AddObject(shonk);
 
             XDidYToZ(
-                Actor: who,
+                Actor: finder,
                 Verb: "spot",
                 Object: shonk,
-                Extra: who.DescribeDirectionToward(shonk),
+                Extra: finder.DescribeDirectionToward(shonk),
                 EndMark: "!",
-                ColorAsGoodFor: who,
+                ColorAsGoodFor: finder,
                 IndefiniteObject: true,
                 UseVisibilityOf: shonk
             );
 
-            if (
-                Visible(shonk)
+            if (Visible(shonk)
                 && AutoAct.IsActive()
                 && The.Player.IsRelevantHostile(shonk))
             {
                 AutoAct.Interrupt(IndicateObject: shonk);
             }
 
+            RemoveSelf();
+        }
+
+        private void RemoveSelf()
+        {
             ParentObject.RemovePart(this);
 
-            if (DeleteParent)
-            {
-                ParentObject.Obliterate(Silent: true);
-            }
+            if (ObliterateParent) ParentObject.Obliterate(Silent: true);
         }
     }
 
