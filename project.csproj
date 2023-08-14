@@ -1,3 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Books_Blahaj</AssemblyName>
+    <PackageId>Books_Blahaj</PackageId>
+    <Authors>librarianmage</Authors>
+  </PropertyGroup>
   <Import Project="../Mods.csproj" />
 </Project>
