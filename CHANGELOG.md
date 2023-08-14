@@ -6,6 +6,7 @@ Tested to work on game versions 204.100 / 205.54 (beta)
 * Rebalance spawning frequency and weight
 * Update names
 * Refactor part code
+* Add a Blåhaj to Neek's inventory
 
 Meta:
 

@@ -58,4 +58,8 @@
   <object Name="ConvalessenceDeepPool" Load="Merge">
     <part Name="Books_BlahajSpawner" />
   </object>
+
+  <object Name="Neek" Load="Merge">
+    <inventoryobject Name="Books_Blahaj" Number="1"/>
+  </object>
 </objects>
