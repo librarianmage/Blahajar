@@ -1,8 +1,8 @@
 {
   "WorkshopId": 2841450425,
   "Title": "Blåhaj",
-  "Description": "Adds the wildly popular IKEA plush to Caves of Qud 🥰🦈🥰\n\nBlåhajar can be found where animatable furnature is or in deep pools of convalessence.\n\nTested to work on game version 203.54\n\n[url=https://github.com/librarianmage/Blahajar]Github Page[/url]",
-  "Tags": "Stable,Beta,Script,Item",
+  "Description": "Adds the popular IKEA plush to Caves of Qud 🦈\n\nBlåhajar can be found in deep pools of convalessence.\n\nTested to work on game versions 204.100 / 205.54 (beta).\n\n[url=https://github.com/librarianmage/Blahajar]Source Code (GitHub)[/url]\n\n[h1]Acknowledgements[/h1]Thank you to ontoclasm for inspiration on the tile and Seagull for the description!",
+  "Tags": "Stable,Beta,Item,Creature,Script",
   "Visibility": "2",
-  "ImagePath": "icon.png"
+  "ImagePath": "Assets/icon.png"
 }
