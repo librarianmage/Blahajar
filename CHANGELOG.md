@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3 — 2023-11-23
+Tested to work on game version 206.34
+
+* Refresh for the 7th Plague update
+
 ## v1.2 — 2023-08-14
 Tested to work on game versions 204.100 / 205.54 (beta)
 

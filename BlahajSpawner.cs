@@ -1,28 +1,29 @@
 using System;
 using System.Linq;
 using XRL.Rules;
-using XRL.World.Capabilities;
 
 namespace XRL.World.Parts
 {
     /// <summary>
-    ///   Object has a chance of spawning a hidden Blåhaj
+    /// Gives the object a chance of spawning a hidden Blåhaj.
     /// </summary>
     /// <remarks>
-    ///   Object has a <see cref="SpawnChance"/>% chance of activating upon creation. When active, the spawning can be triggered under three circumstances:
-    ///   <list type="number">
-    ///     <item>
-    ///       <description>The cell is lit with <c>Omniscient</c>, <c>LitRadar</c>, or <c>Radar</c> light.</description>
-    ///     </item>
-    ///     <item>
-    ///       <description>A creature enters the same cell, with <see cref="TrampleRevealChance"/>% chance.</description>
-    ///     </item>
-    ///     <item>
-    ///       <description>The player makes an INT save of difficulty <see cref="SearchDifficulty"/> while searching.</description>
-    ///     </item>
-    ///   </list>
-    ///   When the part fails to activate or successfully spawns, it will remove itself from its parent and optionally obliterate its parent if <see cref="ObliterateParent"/> is set.
+    /// Object has a <see cref="SpawnChance"/>% chance of activating upon creation. When active, the spawning can be triggered under three circumstances:
+    /// <list type="number">
+    ///   <item>
+    ///     <description>The cell is lit with <c>Omniscient</c>, <c>LitRadar</c>, or <c>Radar</c> light.</description>
+    ///   </item>
+    ///   <item>
+    ///     <description>A creature enters the same cell, with <see cref="TrampleRevealChance"/>% chance.</description>
+    ///   </item>
+    ///   <item>
+    ///     <description>The player makes an INT save of difficulty <see cref="SearchDifficulty"/> while searching.</description>
+    ///   </item>
+    /// </list>
+    /// When the part fails to activate or successfully spawns, it will remove itself from its parent and optionally obliterate its parent if <see cref="ObliterateParent"/> is set.
     /// </remarks>
+    /// <seealso cref="EelSpawn"/>
+    /// <seealso cref="Hidden"/>
     /// <seealso cref="LightLevel"/>
     /// <seealso cref="Physics.Search"/>
     [Serializable]
@@ -30,18 +31,42 @@ namespace XRL.World.Parts
     {
         private const string BlahajBlueprint = "Books_Blahaj";
 
+        /// <summary>
+        /// The percentage chance that the part gets set up to spawn.
+        /// </summary>
         public int SpawnChance = 1;
+
+        /// <summary>
+        /// The percentage chance that the object spawns when a creature enters the cell.
+        /// </summary>
         public int TrampleRevealChance = 50;
+
+        /// <summary>
+        /// The difficulty of the INT roll used when searching.
+        /// </summary>
+        /// <seealso cref="Physics.Search"/>
         public int SearchDifficulty = 14;
+
+        /// <summary>
+        /// Whether to destroy the parent object after spawning.
+        /// </summary>
         public bool ObliterateParent = false;
 
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            ParentObject.pRender.CustomRender = true;
+            ParentObject.ModIntProperty("CustomRenderSources", 1);
+        }
+
         public override bool SameAs(IPart p) =>
-            base.SameAs(p)
-            && p is Books_BlahajSpawner o
+            p is Books_BlahajSpawner o
             && o.SpawnChance == SpawnChance
             && o.TrampleRevealChance == TrampleRevealChance
             && o.SearchDifficulty == SearchDifficulty
-            && o.ObliterateParent == ObliterateParent;
+            && o.ObliterateParent == ObliterateParent
+            && base.SameAs(p);
 
         public override bool WantEvent(int ID, int cascade) =>
             base.WantEvent(ID, cascade)
@@ -107,7 +132,12 @@ namespace XRL.World.Parts
 
         private void Reveal(GameObject finder = null, bool adjacentCell = false)
         {
-            finder = finder ?? The.Player;
+            if (ParentObject.ModIntProperty("CustomRenderSources", -1, RemoveIfZero: true) == 0)
+            {
+                ParentObject.pRender.CustomRender = false;
+            }
+
+            finder ??= The.Player;
 
             var cell = currentCell;
 
@@ -119,7 +149,7 @@ namespace XRL.World.Parts
                     .GetRandomElement() ?? currentCell;
             }
 
-            var shonk = GameObject.create(BlahajBlueprint);
+            var shonk = GameObject.Create(BlahajBlueprint);
             shonk.MakeActive();
             cell.AddObject(shonk);
 
@@ -133,13 +163,6 @@ namespace XRL.World.Parts
                 IndefiniteObject: true,
                 UseVisibilityOf: shonk
             );
-
-            if (Visible(shonk)
-                && AutoAct.IsActive()
-                && The.Player.IsRelevantHostile(shonk))
-            {
-                AutoAct.Interrupt(IndicateObject: shonk);
-            }
 
             RemoveSelf();
         }
